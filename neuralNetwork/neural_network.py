@@ -5,9 +5,10 @@ from neuron import Neuron
 
 
 class NeuralNetwork():
-    def __init__(self, layers_sizes, activation_function):
+    def __init__(self, layers_sizes, activation_function, softmax=True):
         self.layers_sizes = layers_sizes
         self.activation_function = activation_function
+        self.softmax = softmax
         self.layers = list()
         self.generate_network()
 
@@ -22,8 +23,8 @@ class NeuralNetwork():
 
     def print_network(self):
         for i, e in enumerate(self.layers):
-            print(f'{i}) {[round(n.value) for n in e.neurons]}')
+            print(f'{i}) {[n.value for n in e.neurons]}')
     
     def process_step(self):
         for i in range(1, len(self.layers)):
-            self.layers[i].change_neurons(self.layers[i-1].pass_values())
+            self.layers[i].change_neurons(self.layers[i-1].pass_values(), self.softmax)

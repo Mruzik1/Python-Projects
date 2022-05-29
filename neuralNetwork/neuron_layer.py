@@ -13,6 +13,7 @@ class NeuronsLayer():
         return sum(np.array([e.pass_value(self.activation_function) for e in self.neurons]))
 
     # new values for neurons
-    def change_neurons(self, new_values):
+    def change_neurons(self, new_values, softmax):
         for i, e in enumerate(self.neurons):
-            if i in range(len(new_values)): e.value += new_values[i]
+            if softmax: e.value = np.e**new_values[i]/sum([np.e**i for i in new_values])
+            else: e.value = new_values[i]
