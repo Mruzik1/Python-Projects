@@ -1,4 +1,4 @@
-from random import randint
+from random import uniform
 import time, os, discord, threading
 
 
@@ -37,7 +37,7 @@ class EmojiFlooder(discord.Client):
         if not self.__pause:
             if (msg.author.id in self.people or self.__total_mode) and msg.channel.id in self.channels:
                 try:
-                    time.sleep(randint(0, 6))
+                    time.sleep(uniform(1.5, 3.5))
                     threading.Thread(target = self.delay_counter).start()
                     await msg.add_reaction(self.reaction)
                     await msg.remove_reaction(self.reaction, self.user)
