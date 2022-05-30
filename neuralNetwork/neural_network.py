@@ -1,30 +1,20 @@
 import numpy as np
 import random
-from neuron_layer import NeuronsLayer 
-from neuron import Neuron 
 
 
 class NeuralNetwork():
-    def __init__(self, layers_sizes, activation_function, softmax=True):
-        self.layers_sizes = layers_sizes
-        self.activation_function = activation_function
-        self.softmax = softmax
-        self.layers = list()
-        self.generate_network()
+    def __init__(self, layers_sizes, act_func, predictions, data, act_func_der):
+        self.act_func = act_func
+        self.act_func_der = act_func_der
+        self.predictions = predictions
+        self.data = data
+        self.weights = list()
+        self.init_network(layers_sizes)
 
-    def generate_network(self):
-        for i, e in enumerate(self.layers_sizes):
-            neurons = list()
-            for _ in range(e):
-                weights = np.random.rand(1, self.layers_sizes[i+1]) if i < len(self.layers_sizes)-1 else [[]]
-                value = random.randint(1, 10) if i == 0 else 0
-                neurons.append(Neuron(value, weights[0]))
-            self.layers.append(NeuronsLayer(neurons, self.activation_function))
-
-    def print_network(self):
-        for i, e in enumerate(self.layers):
-            print(f'{i}) {[n.value for n in e.neurons]}')
-    
-    def process_step(self):
-        for i in range(1, len(self.layers)):
-            self.layers[i].change_neurons(self.layers[i-1].pass_values(), self.softmax)
+    # generates the neural network with random weights (and also with rand values, will be changed later)
+    def init_network(self, layers_sizes):
+        self.biases = np.array([np.array([0 for _ in range(e)]) for e in layers_sizes])
+        for e1, e2 in zip(layers_sizes[:-1], layers_sizes[1:]):
+            self.weights.append(np.random.uniform(-0.5, 0.5, (e2, e1)))
+        print(self.weights)
+        print(self.biases)

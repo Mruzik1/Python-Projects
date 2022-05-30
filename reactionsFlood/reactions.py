@@ -1,7 +1,5 @@
-import time
-import os
-import discord
-import threading
+from random import randint
+import time, os, discord, threading
 
 
 class EmojiFlooder(discord.Client):
@@ -11,6 +9,7 @@ class EmojiFlooder(discord.Client):
         self.delay = 2
         self.people = []
         self.__pause = False
+        self.__total_mode = False
         super().__init__(*args, **kwargs)
 
 
@@ -25,6 +24,7 @@ class EmojiFlooder(discord.Client):
 
         print(f'Delay: {self.delay}s')
         print(f'Reaction: {self.reaction}')
+        print(f'Total mode: {self.__total_mode}')
 
     
     def delay_counter(self):
@@ -35,10 +35,10 @@ class EmojiFlooder(discord.Client):
     
     async def on_message(self, msg):
         if not self.__pause:
-            threading.Thread(target = self.delay_counter).start()
-
-            if msg.author.id in self.people and msg.channel.id in self.channels:
+            if (msg.author.id in self.people or self.__total_mode) and msg.channel.id in self.channels:
                 try:
+                    time.sleep(randint(0, 6))
+                    threading.Thread(target = self.delay_counter).start()
                     await msg.add_reaction(self.reaction)
                     await msg.remove_reaction(self.reaction, self.user)
                 except: print("\nCan't add/remove reaction!\n>>> ", end='')
@@ -80,9 +80,11 @@ class EmojiFlooder(discord.Client):
                 else:
                     try:
                         if int(cmd[1]) >= 0:
-                            print(f'New delay: {cmd[1]}s')
-                            self.delay = int(cmd[1])
-                            continue
+                            if int(cmd[1]) < 100:
+                                print(f'New delay: {cmd[1]}s')
+                                self.delay = int(cmd[1])
+                                continue
+                            else: print('The value is too big (99 seconds or less is required)')
                     except: pass
                     print('Wrong time format, use positive integers!')
 
@@ -130,6 +132,11 @@ class EmojiFlooder(discord.Client):
                 print(f'Channels ids: {self.channels}')
                 print(f'Users ids: {self.people}')
 
+            # switch the total mode
+            elif cmd[0].lower() == 'total':
+                self.__total_mode = False if self.__total_mode else True
+                print(f'Total mode has been switched to {self.__total_mode}!')
+
             # all commands list
             elif cmd[0].lower() == 'help':
                 print('Commands list:')
@@ -141,6 +148,7 @@ class EmojiFlooder(discord.Client):
                 print('DELAY [SECONDS, COULD BE 0]  -  change the delay.')
                 print('ADD [CHAT/USER] [ID]  -  add chat-room/user ID to the list.')
                 print('REMOVE [CHAT/USER] [ID]  -  remove chat-room/user ID from the list.')
+                print('TOTAL  -  switch the total mode (react to all messages or not)')
             
             # wrong command
             else: print('Wrong command! Try using [HELP]')
