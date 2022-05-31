@@ -152,7 +152,7 @@ class EmojiFlooder(discord.Client):
                 print(f'Total mode has been switched to {self.__total_mode}!')
 
             # switch the thunder mode (doesn't work well tho)
-            elif cmd[0].lower() == 'total':
+            elif cmd[0].lower() == 'thunder':
                 self.__thunder = False if self.__thunder else True
                 print(f'[TEST] Thunder mode has been switched to {self.__thunder}! [TEST]')
 
