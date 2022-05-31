@@ -1,15 +1,16 @@
 from random import uniform
-import time, os, discord, threading
+import time, os, discord, threading, asyncio
 
 
 class EmojiFlooder(discord.Client):
     def __init__(self, *args, **kwargs):
         self.channels = []
+        self.people = []
         self.reaction = '🤓'
         self.delay = 2
-        self.people = []
         self.__pause = False
         self.__total_mode = False
+        self.__thunder = False
         super().__init__(*args, **kwargs)
 
 
@@ -33,14 +34,27 @@ class EmojiFlooder(discord.Client):
         self.__pause = False
 
     
+    async def _thunder_reaction(self, msg):
+        await msg.add_reaction(self.reaction)
+        await msg.remove_reaction(self.reaction, self.user)
+
+
+    def thread_reaction(self, msg):
+        loop = asyncio.run_coroutine_threadsafe(self._thunder_reaction(msg), self.loop)
+        loop.result()
+
+    
     async def on_message(self, msg):
         if not self.__pause:
             if (msg.author.id in self.people or self.__total_mode) and msg.channel.id in self.channels:
                 try:
-                    time.sleep(uniform(1.5, 3.5))
-                    threading.Thread(target = self.delay_counter).start()
-                    await msg.add_reaction(self.reaction)
-                    await msg.remove_reaction(self.reaction, self.user)
+                    if self.__thunder:
+                        threading.Thread(target = self.thread_reaction, args = [msg]).start()
+                    else:
+                        time.sleep(uniform(1.5, 3.5))
+                        threading.Thread(target = self.delay_counter).start()
+                        await msg.add_reaction(self.reaction)
+                        await msg.remove_reaction(self.reaction, self.user)
                 except: print("\nCan't add/remove reaction!\n>>> ", end='')
 
 
@@ -136,6 +150,11 @@ class EmojiFlooder(discord.Client):
             elif cmd[0].lower() == 'total':
                 self.__total_mode = False if self.__total_mode else True
                 print(f'Total mode has been switched to {self.__total_mode}!')
+
+            # switch the thunder mode (doesn't work well tho)
+            elif cmd[0].lower() == 'total':
+                self.__thunder = False if self.__thunder else True
+                print(f'[TEST] Thunder mode has been switched to {self.__thunder}! [TEST]')
 
             # all commands list
             elif cmd[0].lower() == 'help':
