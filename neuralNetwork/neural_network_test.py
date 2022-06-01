@@ -2,9 +2,9 @@ import numpy as np
 
 
 # biases for the nn with layers' sizes: 2 2 2 plus biases
-input_val = np.array([0.05, 0.1, 0.35]).T
-hidden = np.array([0, 0, 0.6]).T
-output_val = np.array([0, 0]).T
+input_val = np.array([0.05, 0.1, 0.35])
+hidden = np.array([0, 0, 0.6])
+output_val = np.array([0, 0])
 
 # weights
 w1 = np.array([[0.15, 0.2, 1], [0.25, 0.3, 1]])
@@ -23,4 +23,9 @@ def forward_pass_step(layer, weights, activation_func):
     return activation(weights.dot(layer))
 
 
-print(forward_pass_step(input_val, w1, activation_func))
+if __name__ == '__main__':
+    # because we need same shapes and also the bias, let's append 0 at the end of the function's result
+    hidden += np.append(forward_pass_step(input_val, w1, activation_func), 0)
+    output_val = forward_pass_step(hidden, w2, activation_func)
+
+    print(hidden, output_val)
