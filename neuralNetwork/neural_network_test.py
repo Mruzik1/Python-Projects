@@ -85,10 +85,12 @@ if __name__ == '__main__':
 
         # weights and neurons lists
         weights = [w1.T[:-1].T, w2.T[:-1].T]
-        neurons = [input_val.copy()[:-1], hidden.copy()[:-1], output_val]
+        neurons = [input_val[:-1], hidden[:-1], output_val]
 
         print(total_error(activation(output_val), predictions))
     
         weights = backprop(weights, neurons, 0.5)
         w1 = np.append(weights[0], np.array([[1], [1]]), 1)
         w2 = np.append(weights[1], np.array([[1], [1]]), 1)
+    
+    print(activation(output_val))
