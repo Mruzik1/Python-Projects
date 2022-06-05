@@ -52,20 +52,20 @@ def error_neuron_der(weights, neurons, n, layer):
 
 # TEST! counts the derivative of the total error with respect to any weight
 def error_weight_der(weights, neurons, w, layer):
-    dadz = act_func_der(neurons[layer+1][w[1]])
-    dzdw = act_func(neurons[layer][w[0]]) if layer != 0 else neurons[layer][w[0]]
+    dadz = act_func_der(neurons[layer+1][w[0]])
+    dzdw = act_func(neurons[layer][w[1]]) if layer != 0 else neurons[layer][w[1]]
 
-    return error_neuron_der(weights, neurons, w[1], layer+1) * dadz * dzdw
+    return error_neuron_der(weights, neurons, w[0], layer+1) * dadz * dzdw
 
 
 def backprop(weights, neurons, learning_speed):
     new_weights = list()
 
     for layer in range(len(neurons)-1, 0, -1):
-        tmp = weights[layer-1][:]
+        tmp = weights[layer-1].copy()
 
         for i in range(len(tmp)):
-            for j in range(len(tmp)):
+            for j in range(len(tmp[i])):
                 tmp[i][j] -= learning_speed * error_weight_der(weights, neurons, [i, j], layer-1)
             
         new_weights.append(tmp)
@@ -83,11 +83,11 @@ if __name__ == '__main__':
         hidden = np.append(forward_pass_step(input_val, w1), bias2)
         output_val = forward_pass_step(np.append(activation(hidden[:-1]), hidden[-1]), w2)
 
-        print(output_val)
-
         # weights and neurons lists
         weights = [w1.T[:-1].T, w2.T[:-1].T]
-        neurons = [input_val[:-1], hidden[:-1], output_val]
+        neurons = [input_val.copy()[:-1], hidden.copy()[:-1], output_val]
+
+        print(total_error(activation(output_val), predictions))
     
         weights = backprop(weights, neurons, 0.5)
         w1 = np.append(weights[0], np.array([[1], [1]]), 1)
