@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 # biases for the nn with layers' sizes: 2 2 2 plus biases
@@ -73,9 +74,9 @@ def backprop(weights, neurons, learning_speed):
     return new_weights
 
 
-
 if __name__ == '__main__':
     activation = np.vectorize(act_func)
+    errors = list()
 
     for _ in range(10000):
         
@@ -87,10 +88,15 @@ if __name__ == '__main__':
         weights = [w1.T[:-1].T, w2.T[:-1].T]
         neurons = [input_val[:-1], hidden[:-1], output_val]
 
-        print(total_error(activation(output_val), predictions))
+        errors.append(total_error(activation(output_val), predictions))
     
         weights = backprop(weights, neurons, 0.5)
         w1 = np.append(weights[0], np.array([[1], [1]]), 1)
         w2 = np.append(weights[1], np.array([[1], [1]]), 1)
+
+        print(activation(output_val))
     
-    print(activation(output_val))
+        plt.plot(errors)
+        plt.pause(0.0005)
+        
+    plt.show()
