@@ -33,20 +33,22 @@ def total_error(output, predictions):
 
 
 # TESTING! counts the derivative of the total error with respect to any neuron
-def error_neuron_der(weights, neurons, n, prev_n):
-    if len(neurons) <= 1:
-        dzda = weights[-1][n][prev_n]
-        dadz = act_func_der(neurons[-1][n])
-        dEda = -2/len(neurons[-1])*(predictions[n]-act_func(neurons[-1][n]))
-
-        return dzda * dadz * dEda
+def error_neuron_der(weights, neurons, n, layer):
+    if layer == len(neurons)-1:
+        return -2/len(neurons[layer])*(predictions[n]-act_func(neurons[layer][n]))
     
     result = list()
 
-    for i in range(len(neurons[1])):
-        result.append(error_neuron_der(weights[1:], neurons[1:], i, n))
+    for i in range(len(neurons[layer])):
+        dzda = weights[layer][i][n]
+        dadz = act_func_der(neurons[layer+1][i])
+        result.append(error_neuron_der(weights, neurons, i, layer+1)*dzda*dadz)
 
     return sum(result)
+
+
+def error_weight_der(weights, neurons, w):
+    pass
 
 
 if __name__ == '__main__':
@@ -57,4 +59,4 @@ if __name__ == '__main__':
     output_val += forward_pass_step(np.append(activation(hidden[:-1]), hidden[-1]), w2)
     
     # seems to be right (error neuron derivative)
-    print(error_neuron_der([w1.T[:-1].T, w2.T[:-1].T], [activation(hidden[:-1]), output_val], 0, 0))
+    print(error_neuron_der([w1.T[:-1].T, w2.T[:-1].T], [input_val[:-1], activation(hidden[:-1]), output_val], 0, 1))
