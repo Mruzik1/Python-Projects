@@ -87,7 +87,7 @@ class NeuralNetwork():
 
     # repeats back propagation 'times' times, then returns weights, and prints the total error
     def train(self, times, learning_speed, inputs):
-        print('The training has been started, please wait...')
+        print('The training has started, please wait...')
 
         for _ in range(times):
             for input_data in inputs:
