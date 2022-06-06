@@ -18,7 +18,4 @@ if __name__ == '__main__':
     sizes = [2, 6, 8, 3]
     nn = NeuralNetwork(act_func, act_func_der, input_data, predictions, sizes)
 
-    for _ in range(10000):
-        nn.forward_pass()
-        print(nn.total_error())
-        nn.backprop(0.5)
+    nn.train(10000, 0.5)

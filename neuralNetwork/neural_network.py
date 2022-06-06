@@ -20,6 +20,7 @@ class NeuralNetwork():
         for l1, l2 in zip(layers_sizes[:-1], layers_sizes[1:]):
             self.weights.append(np.random.random((l2, l1)))
             self.biases.append(random.random())
+        self._forward_pass()
 
 
     # makes one forward pass to the next layer, returns inactivated values
@@ -31,13 +32,14 @@ class NeuralNetwork():
 
 
     # generates all nodes (just performs the forward propagation)
-    def forward_pass(self):
+    def _forward_pass(self):
+        self.nodes = [self.nodes[0]]
         for l in range(len(self.weights)):
             self.nodes.append(self._forward_pass_step(l))
 
 
     # calculates the total error
-    def total_error(self):
+    def _total_error(self):
         
         return sum(1 / self.nodes[-1].size * (self.predictions-self.activation(self.nodes[-1]))**2)
 
@@ -81,4 +83,15 @@ class NeuralNetwork():
 
         new_weights.reverse()
         self.weights = new_weights
-        self.nodes = [self.nodes[0]]
+        self._forward_pass()
+
+
+    # repeats back propagation 'times' times, then returns weights, and prints the total error
+    def train(self, times, learning_speed):
+        print('The training has been started, please wait...')
+
+        for _ in range(times):
+            self.backprop(learning_speed)
+        print(f'Total error: {self._total_error()}')
+
+        return self.weights
