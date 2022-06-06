@@ -14,9 +14,11 @@ def act_func_der(x):
 
 if __name__ == '__main__':
     input_data = [0.05, 0.1]
-    predictions = [0.01, 0.99]
-    sizes = [2, 8, 6, 2]
+    predictions = [0.01, 0.99, 1]
+    sizes = [2, 6, 8, 3]
     nn = NeuralNetwork(act_func, act_func_der, input_data, predictions, sizes)
 
-    nn.forward_pass()
-    print(nn.total_error())
+    for _ in range(10000):
+        nn.forward_pass()
+        print(nn.total_error())
+        nn.backprop(0.5)

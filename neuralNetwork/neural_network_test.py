@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 # biases for the nn with layers' sizes: 2 2 2 plus biases
@@ -43,7 +42,7 @@ def error_neuron_der(weights, neurons, n, layer):
     
     result = list()
 
-    for i in range(len(neurons[layer])):
+    for i in range(len(neurons[layer+1])):
         dzda = weights[layer][i][n]
         dadz = act_func_der(neurons[layer+1][i])
         result.append(error_neuron_der(weights, neurons, i, layer+1) * dzda * dadz)
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     activation = np.vectorize(act_func)
     errors = list()
 
-    for _ in range(10000):
+    for _ in range(2):
         
         # because we need same shapes and also the bias, let's append 0 at the end of the function's result
         hidden = np.append(forward_pass_step(input_val, w1), bias2)
@@ -94,9 +93,4 @@ if __name__ == '__main__':
         w1 = np.append(weights[0], np.array([[1], [1]]), 1)
         w2 = np.append(weights[1], np.array([[1], [1]]), 1)
 
-        print(activation(output_val))
-    
-        plt.plot(errors)
-        plt.pause(0.0005)
-        
-    plt.show()
+        print(total_error(activation(output_val), predictions))    
