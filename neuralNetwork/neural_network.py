@@ -4,11 +4,10 @@ import random
 
 class NeuralNetwork():
     # input data sh
-    def __init__(self, act_func, act_func_der, input_data, predictions, layers_sizes):
+    def __init__(self, act_func, act_func_der, input_data, layers_sizes):
         self.act_func = act_func
         self.act_func_der = act_func_der
         self.activation = np.vectorize(self.act_func)
-        self.predictions = predictions
         self.nodes = [np.array(input_data)]
         self.weights = list()
         self.biases = list()                    # contains only bias weights
@@ -39,37 +38,37 @@ class NeuralNetwork():
 
 
     # calculates the total error
-    def _total_error(self):
+    def _total_error(self, prediction):
         
-        return sum(1 / self.nodes[-1].size * (self.predictions-self.activation(self.nodes[-1]))**2)
+        return sum(1 / self.nodes[-1].size * (prediction-self.activation(self.nodes[-1]))**2)
 
 
     # computes the derivative of the total error with respect to any neuron
-    def _error_neuron_der(self, n, layer):
+    def _error_neuron_der(self, n, layer, prediction):
         if layer == len(self.nodes)-1:
-            return -2/len(self.nodes[layer])*(self.predictions[n]-self.act_func(self.nodes[layer][n]))
+            return -2/len(self.nodes[layer])*(prediction[n]-self.act_func(self.nodes[layer][n]))
     
         result = list()
 
         for i in range(len(self.nodes[layer+1])):
             dzda = self.weights[layer][i][n]
             dadz = self.act_func_der(self.nodes[layer+1][i])
-            result.append(self._error_neuron_der(i, layer+1) * dzda * dadz)
+            result.append(self._error_neuron_der(i, layer+1, prediction) * dzda * dadz)
 
         return sum(result)
 
 
     # computes the derivative of the total error with respect to any weight
-    def _error_weight_der(self, w, layer):
+    def _error_weight_der(self, w, layer, prediction):
         dadz = self.act_func_der(self.nodes[layer+1][w[0]])
         dzdw = self.act_func(self.nodes[layer][w[1]]) if layer != 0 else self.nodes[layer][w[1]]
-        dEda = self._error_neuron_der(w[0], layer+1)
+        dEda = self._error_neuron_der(w[0], layer+1, prediction)
 
         return dEda * dadz * dzdw
 
 
     # one step of back propagation
-    def backprop(self, learning_speed):
+    def backprop(self, learning_speed, prediction):
         new_weights = list()
 
         for layer in range(len(self.nodes)-1, 0, -1):
@@ -77,7 +76,7 @@ class NeuralNetwork():
 
             for i in range(len(tmp)):
                 for j in range(len(tmp[i])):
-                    tmp[i][j] -= learning_speed * self._error_weight_der((i, j), layer-1)
+                    tmp[i][j] -= learning_speed * self._error_weight_der((i, j), layer-1, prediction)
             
             new_weights.append(tmp)
 
@@ -87,11 +86,14 @@ class NeuralNetwork():
 
 
     # repeats back propagation 'times' times, then returns weights, and prints the total error
-    def train(self, times, learning_speed):
+    def train(self, times, learning_speed, predictions):
         print('The training has been started, please wait...')
 
         for _ in range(times):
-            self.backprop(learning_speed)
-        print(f'Total error: {self._total_error()}')
+            for p in predictions:
+                self.backprop(learning_speed, p)
+
+        for p in predictions:
+            print(f'Total error for {p}: {self._total_error(p)}')
 
         return self.weights
