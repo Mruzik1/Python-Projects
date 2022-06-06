@@ -13,9 +13,9 @@ def act_func_der(x):
 
 
 if __name__ == '__main__':
-    input_data = [0.05, 0.1]
-    predictions = [[0.01, 0.99, 1]]
+    inputs = [[0.05, 0.1], [0.2, 0.4]]
+    predictions = [0.01, 0.99, 1]
     sizes = [2, 6, 8, 3]
-    nn = NeuralNetwork(act_func, act_func_der, input_data, sizes)
+    nn = NeuralNetwork(act_func, act_func_der, predictions, sizes)
 
-    nn.train(1000, 0.5, predictions)
+    nn.train(1000, 0.5, inputs)
