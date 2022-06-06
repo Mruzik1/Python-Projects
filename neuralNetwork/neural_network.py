@@ -92,7 +92,6 @@ class NeuralNetwork():
         for _ in range(times):
             for input_data in inputs:
                 self.backprop(learning_speed, input_data)
-                print(f'Total error for {input_data}: {self._total_error(input_data)}')
         
         for input_data in inputs:
             print(f'Total error for {input_data}: {self._total_error(input_data)}')
