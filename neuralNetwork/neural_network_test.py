@@ -26,7 +26,7 @@ def act_func_der(x):
     return np.exp(x) / (1 + np.exp(x))**2
 
 
-# makes one forward pass to the next layer, return activated and inactivated values
+# makes one forward pass to the next layer, returns inactivated values
 def forward_pass_step(layer, weights):
     return weights.dot(layer)
 
