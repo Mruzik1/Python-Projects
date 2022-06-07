@@ -58,12 +58,16 @@ class NeuralNetwork():
 
 
     # computes the derivative of the total error with respect to any weight
-    def _error_weight_der(self, w, layer, prediction):
-        dadz = self.act_func_der(self.nodes[layer+1][w[0]])
-        dzdw = self.act_func(self.nodes[layer][w[1]]) if layer != 0 else self.nodes[layer][w[1]]
-        dEda = self._error_neuron_der(w[0], layer+1, prediction)
+    def _error_weight_der(self, weights, w_idx, layer, prediction):
+        result = np.array([])
+        dadz = self.act_func_der(self.nodes[layer+1][w_idx])
+        dEda = self._error_neuron_der(w_idx, layer+1, prediction)
 
-        return dEda * dadz * dzdw
+        for w in range(len(weights)):
+            dzdw = self.act_func(self.nodes[layer][w]) if layer != 0 else self.nodes[layer][w]
+            result = np.append(result, dEda * dadz * dzdw)
+
+        return result
 
     # computes the derivative of the total error with respect to any bias
     def _error_bias_der(self, b, layer, prediction):
@@ -80,9 +84,8 @@ class NeuralNetwork():
             tmp_w = self.weights[layer-1].copy()
             tmp_b = self.biases[layer-1].copy()
 
-            for i in range(len(tmp_w)):
-                for j in range(len(tmp_w[i])):
-                    tmp_w[i][j] -= learning_speed * self._error_weight_der((i, j), layer-1, prediction)
+            for i, e in enumerate(tmp_w):
+                tmp_w[i] -= learning_speed * self._error_weight_der(e, i, layer-1, prediction)
 
             for i in range(len(tmp_b)):
                 tmp_b[i] -= learning_speed * self._error_bias_der(i, layer-1, prediction)
