@@ -18,7 +18,7 @@ class NeuralNetwork():
     def _init_network(self, layers_sizes):
         for l1, l2 in zip(layers_sizes[:-1], layers_sizes[1:]):
             self.weights.append(np.random.random((l2, l1)))
-            self.biases.append(random.random())
+            self.biases.append(np.random.random(l2))
 
 
     # makes one forward pass to the next layer, returns inactivated values
@@ -65,23 +65,35 @@ class NeuralNetwork():
 
         return dEda * dadz * dzdw
 
+    # computes the derivative of the total error with respect to any bias
+    def _error_bias_der(self, b, layer, prediction):
+        return self.act_func_der(self.nodes[layer+1][b]) * self._error_neuron_der(b, layer+1, prediction)
+
 
     # one step of back propagation
     def backprop(self, learning_speed, input_data, prediction):
         new_weights = list()
+        new_biases = list()
         self._forward_pass(input_data)
 
         for layer in range(len(self.nodes)-1, 0, -1):
-            tmp = self.weights[layer-1].copy()
+            tmp_w = self.weights[layer-1].copy()
+            tmp_b = self.biases[layer-1].copy()
 
-            for i in range(len(tmp)):
-                for j in range(len(tmp[i])):
-                    tmp[i][j] -= learning_speed * self._error_weight_der((i, j), layer-1, prediction)
+            for i in range(len(tmp_w)):
+                for j in range(len(tmp_w[i])):
+                    tmp_w[i][j] -= learning_speed * self._error_weight_der((i, j), layer-1, prediction)
+
+            for i in range(len(tmp_b)):
+                tmp_b[i] -= learning_speed * self._error_bias_der(i, layer-1, prediction)
             
-            new_weights.append(tmp)
+            new_weights.append(tmp_w)
+            new_biases.append(tmp_b)
 
         new_weights.reverse()
+        new_biases.reverse()
         self.weights = new_weights
+        self.biases = new_biases
 
 
     # repeats back propagation 'times' times, then returns weights, and prints the total error
